@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 
 # Install clair-scanner
-wget -O https://github.com/arminc/clair-scanner/releases/download/v12/clair-scanner_linux_amd64 /usr/local/bin/clair-scanner
+wget https://github.com/arminc/clair-scanner/releases/download/v12/clair-scanner_linux_amd64 -O /usr/local/bin/clair-scanner
 chmod +x /usr/local/bin/clair-scanner
 
 IMAGE=${PUSH_IMAGE}:${PUSH_TAG}
-docker pull $IMAGE
+RESULTS_FILE=${IMAGE//[\/\-:\.]/_}
+docker pull "${IMAGE}"
 
-clair-scanner --ip=`hostname -I | awk '{print $1}'` $IMAGE &> "${i}_results.txt"
-high_count=`grep High ${i}_results.txt | wc -l`
+clair-scanner --ip="$(hostname -I | awk '{print $1}')" "${IMAGE}" &> "${RESULTS_FILE}"
+high_count=$(grep -c High "${PUSH_IMAGE}"_results.txt)
 
-if [ !high_count -eq 0 ]; then
-  do printf "Docker image %55s have %10s High\n" $image ${high_count//[[:space:]]/}
-  cat "${i}_results.txt"
+if [[ high_count -ne 0 ]];
+then
+    printf "Docker image %55s have %10s High\n" "${IMAGE}" "${high_count//[[:space:]]/}"
+    cat "${RESULTS_FILE}"
+    rm -f "${RESULTS_FILE}"
 fi
