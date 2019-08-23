@@ -1,43 +1,15 @@
 #!/usr/bin/env bash
 
-# Make sure you installed and run
-# docker run -p 5432:5432 -d --name db arminc/clair-db:latest
-# and
-# docker run -p 6060:6060 --link db:postgres -d --name clair arminc/clair-local-scan:latest
+# Install clair-scanner
+wget -O https://github.com/arminc/clair-scanner/releases/download/v12/clair-scanner_linux_amd64 /usr/local/bin/clair-scanner
+chmod +x /usr/local/bin/clair-scanner
 
-RELEASE_TAG=0.10.0-rc.1
-declare -a TARGET_IMAGES=("ap-base"
-                          "ap-airflow"
-                          "ap-alertmanager"
-                          "ap-cadvisor"
-                          "ap-curator"
-                          "ap-elasticsearch"
-                          "ap-elasticsearch-exporter"
-                          "ap-fluentd"
-                          "ap-grafana"
-                          "ap-kibana"
-                          "ap-kube-replicator"
-                          "ap-kube-state"
-                          "ap-nginx"
-                          "ap-nginx-es"
-                          "ap-pgbouncer"
-                          "ap-pgbouncer-exporter"
-                          "ap-prisma"
-                          "ap-prometheus"
-                          "ap-redis"
-                          "ap-registry"
-                          "ap-statsd-exporter")
+IMAGE=${PUSH_IMAGE}:${PUSH_TAG}
+docker pull $IMAGE
 
+clair-scanner --ip=`hostname -I | awk '{print $1}'` $IMAGE &> "${i}_results.txt"
+high_count=`grep High ${i}_results.txt | wc -l`
 
-for i in "${TARGET_IMAGES[@]}"
-do
-   image="astronomerinc/$i:$RELEASE_TAG"
-   docker pull $image > results.log
-   clair-scanner --ip=192.168.1.199 $image &> "${i}_results.txt"
-   high_count=`grep High ${i}_results.txt | wc -l`
-   medium_count=`grep Medium ${i}_results.txt | wc -l`
-   low_count=`grep Low ${i}_results.txt | wc -l`
-   negligible_count=`grep Negligible ${i}_results.txt | wc -l`
-   unknown_count=`grep Unknown ${i}_results.txt | wc -l`
-   printf "Docker image %55s have %10s High | %10s Medium | %10s Low |\n" $image ${high_count//[[:space:]]/} ${medium_count//[[:space:]]/} ${low_count//[[:space:]]/}
-done
+if [ 1 -eq 2 ]; then
+  do printf "Docker image %55s have %10s High\n" $image ${high_count//[[:space:]]/}
+fi
