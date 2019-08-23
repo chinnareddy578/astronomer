@@ -10,6 +10,7 @@ docker pull $IMAGE
 clair-scanner --ip=`hostname -I | awk '{print $1}'` $IMAGE &> "${i}_results.txt"
 high_count=`grep High ${i}_results.txt | wc -l`
 
-if [ 1 -eq 2 ]; then
+if [ !high_count -eq 0 ]; then
   do printf "Docker image %55s have %10s High\n" $image ${high_count//[[:space:]]/}
+  cat "${i}_results.txt"
 fi
