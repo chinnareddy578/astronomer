@@ -263,8 +263,8 @@ pipeline:
       status: [ failure, changed ]
 
 services:
-  - name: clair-db
+  clair-db:
     image: arminc/clair-db
 
-  - name: clair-local-scan
+  clair-local-scan:
     image: arminc/clair-local-scan
