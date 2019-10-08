@@ -51,7 +51,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1552258856226,
+  "iteration": 1569541789860,
   "links": [],
   "panels": [
     {
@@ -109,6 +109,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -175,7 +176,7 @@
       "colorValue": true,
       "colors": [
         "#d44a3a",
-        "#d44a3a",
+        "#299c46",
         "#299c46"
       ],
       "datasource": "Prometheus",
@@ -197,7 +198,7 @@
       "id": 65,
       "interval": null,
       "links": [],
-      "mappingType": 1,
+      "mappingType": 2,
       "mappingTypes": [
         {
           "name": "value to text",
@@ -211,15 +212,21 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
       "prefixFontSize": "50%",
       "rangeMaps": [
         {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
+          "from": "0",
+          "text": "Unhealthy",
+          "to": "0.00001"
+        },
+        {
+          "from": "0.00001",
+          "text": "Healthy",
+          "to": "9999999"
         }
       ],
       "sparkline": {
@@ -231,32 +238,22 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "round(rate(airflow_scheduler_heartbeat{deployment=~\"$deployment\", type=\"counter\"}[1m]) * 5)",
+          "expr": "rate(airflow_scheduler_heartbeat{deployment=~\"$deployment\", type=\"counter\"}[1m])",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 2,
           "refId": "A"
         }
       ],
-      "thresholds": "0,1",
+      "thresholds": "0.00001,999999",
       "title": "Scheduler Heartbeat",
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
         {
           "op": "=",
-          "text": "Unknown",
-          "value": "null"
-        },
-        {
-          "op": "=",
-          "text": "Unhealthy",
-          "value": "0"
-        },
-        {
-          "op": "=",
-          "text": "Healthy",
-          "value": "1"
+          "text": "",
+          "value": ""
         }
       ],
       "valueName": "current"
@@ -316,6 +313,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": " pods",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -397,6 +395,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": " cores",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -478,6 +477,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -560,6 +560,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -643,6 +644,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -725,6 +727,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -787,10 +790,10 @@
         "#d44a3a"
       ],
       "datasource": "Prometheus",
-      "description": "The scheduler will heartbeat every loop. Lack of heartbeats indicate potential issues.",
+      "description": "Total successful tasks.",
       "format": "none",
       "gauge": {
-        "maxValue": 100,
+        "maxValue": null,
         "minValue": 0,
         "show": false,
         "thresholdLabels": false,
@@ -798,11 +801,11 @@
       },
       "gridPos": {
         "h": 2,
-        "w": 8,
+        "w": 6,
         "x": 0,
         "y": 13
       },
-      "id": 67,
+      "id": 4,
       "interval": null,
       "links": [],
       "mappingType": 1,
@@ -819,6 +822,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -839,20 +843,102 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(airflow_scheduler_heartbeat{deployment=~\"$deployment\"})",
+          "expr": "sum(airflow_ti_successes{deployment=~\"$deployment\"})",
           "format": "time_series",
           "intervalFactor": 2,
           "refId": "A"
         }
       ],
       "thresholds": "",
-      "title": "Scheduler Heartbeat",
+      "title": "Successful Tasks",
       "type": "singlestat",
       "valueFontSize": "70%",
       "valueMaps": [
         {
           "op": "=",
+          "text": "0",
+          "value": "null"
+        }
+      ],
+      "valueName": "current"
+    },
+    {
+      "cacheTimeout": null,
+      "colorBackground": false,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
+      "datasource": "Prometheus",
+      "description": "Total failed tasks.",
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 6,
+        "x": 6,
+        "y": 13
+      },
+      "id": 14,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "options": {},
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
           "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
+        "show": true
+      },
+      "tableColumn": "",
+      "targets": [
+        {
+          "expr": "sum(airflow_ti_failures{deployment=~\"$deployment\"})",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "refId": "A"
+        }
+      ],
+      "thresholds": "",
+      "title": "Failed Tasks",
+      "type": "singlestat",
+      "valueFontSize": "70%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "0",
           "value": "null"
         }
       ],
@@ -879,8 +965,8 @@
       },
       "gridPos": {
         "h": 2,
-        "w": 8,
-        "x": 8,
+        "w": 6,
+        "x": 12,
         "y": 13
       },
       "id": 6,
@@ -900,6 +986,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -961,8 +1048,8 @@
       },
       "gridPos": {
         "h": 2,
-        "w": 8,
-        "x": 16,
+        "w": 6,
+        "x": 18,
         "y": 13
       },
       "id": 18,
@@ -982,6 +1069,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1022,87 +1110,6 @@
       "valueName": "current"
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
-      "datasource": "Prometheus",
-      "description": "Total successful tasks.",
-      "format": "none",
-      "gauge": {
-        "maxValue": null,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 3,
-        "x": 0,
-        "y": 15
-      },
-      "id": 4,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "expr": "sum(airflow_ti_successes{deployment=~\"$deployment\"})",
-          "format": "time_series",
-          "intervalFactor": 2,
-          "refId": "A"
-        }
-      ],
-      "thresholds": "",
-      "title": "Successful Tasks",
-      "type": "singlestat",
-      "valueFontSize": "70%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "0",
-          "value": "null"
-        }
-      ],
-      "valueName": "current"
-    },
-    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -1110,10 +1117,11 @@
       "datasource": "Prometheus",
       "description": "Rate of task successes.",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 6,
-        "w": 9,
-        "x": 3,
+        "w": 12,
+        "x": 0,
         "y": 15
       },
       "id": 12,
@@ -1130,6 +1138,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null as zero",
+      "options": {
+        "dataLinks": []
+      },
       "paceLength": 10,
       "percentage": false,
       "pointradius": 5,
@@ -1198,9 +1209,10 @@
       "datasource": "Prometheus",
       "description": "Rate of task failures.",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 6,
-        "w": 9,
+        "w": 12,
         "x": 12,
         "y": 15
       },
@@ -1219,6 +1231,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null as zero",
+      "options": {
+        "dataLinks": []
+      },
       "paceLength": 10,
       "percentage": false,
       "pointradius": 5,
@@ -1279,85 +1294,98 @@
       }
     },
     {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": false,
-      "colors": [
-        "#299c46",
-        "rgba(237, 129, 40, 0.89)",
-        "#d44a3a"
-      ],
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
       "datasource": "Prometheus",
-      "description": "Total failed tasks.",
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
+      "description": "TimeSeries Graph showing rate of Scheduler Heartbeart Rate per min. 0 indicate Scheduler outage",
+      "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
-        "h": 6,
-        "w": 3,
-        "x": 21,
-        "y": 15
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 21
       },
-      "id": 14,
-      "interval": null,
+      "id": 76,
+      "interval": "",
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
       "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": true
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
       },
-      "tableColumn": "",
+      "paceLength": 10,
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(airflow_ti_failures{deployment=~\"$deployment\"})",
+          "expr": "rate(airflow_scheduler_heartbeat{deployment=~\"$deployment\", type=\"counter\"}[1m])*60",
           "format": "time_series",
-          "intervalFactor": 2,
+          "instant": false,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "{{deployment}}",
           "refId": "A"
         }
       ],
-      "thresholds": "",
-      "title": "Failed Tasks",
-      "type": "singlestat",
-      "valueFontSize": "70%",
-      "valueMaps": [
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Scheduler Heartbeat Rate",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
         {
-          "op": "=",
-          "text": "0",
-          "value": "null"
+          "format": "opm",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
         }
       ],
-      "valueName": "current"
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "collapsed": false,
@@ -1365,7 +1393,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 21
+        "y": 28
       },
       "id": 71,
       "panels": [],
@@ -1395,7 +1423,7 @@
         "h": 3,
         "w": 12,
         "x": 0,
-        "y": 22
+        "y": 29
       },
       "id": 73,
       "interval": null,
@@ -1414,6 +1442,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1477,7 +1506,7 @@
         "h": 3,
         "w": 12,
         "x": 12,
-        "y": 22
+        "y": 29
       },
       "id": 75,
       "interval": null,
@@ -1496,6 +1525,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1542,7 +1572,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 32
       },
       "id": 22,
       "panels": [],
@@ -1557,11 +1587,12 @@
       "datasource": "Prometheus",
       "description": "Actual CPU utilization across deployment containers.",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 26
+        "y": 33
       },
       "id": 24,
       "interval": "",
@@ -1580,6 +1611,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "paceLength": 10,
       "percentage": false,
       "pointradius": 5,
@@ -1591,7 +1625,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(container_cpu_user_seconds_total{component_name=~\".*(scheduler|webserver|worker|flower|redis|pgbouncer|statsd).*\", deployment=~\"$deployment\"}[3m]) * 100",
+          "expr": "label_replace(  sum(rate(container_cpu_usage_seconds_total{deployment=~\"$deployment\", pod_name!~\".*-worker-.*\",component_name != \"POD\",image!=\"\", container_name!=\"istio-proxy\"}[3m])) by (pod_name, container_name, component_name, namespace, short_name)/  sum(container_spec_cpu_quota{deployment=~\"$deployment\", pod_name!~\".*-worker-.*\", component_name != \"POD\",image!=\"\", container_name!=\"istio-proxy\"}/container_spec_cpu_period{deployment=~\"$deployment\", pod_name!~\".*-worker-.*\", component_name != \"POD\",image!=\"\", container_name!=\"istio-proxy\"}) by (pod_name, container_name, component_name, namespace, short_name)*100,  \"short_name\",  \"$1\",  \"pod_name\",  \"^[[deployment]]-(.*)$\")",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{component_name}}",
@@ -1647,11 +1681,12 @@
       "datasource": "Prometheus",
       "description": "Actual memory utilization across deployment containers.",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 26
+        "y": 33
       },
       "id": 26,
       "legend": {
@@ -1667,6 +1702,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "paceLength": 10,
       "percentage": false,
       "pointradius": 5,
@@ -1678,10 +1716,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "container_memory_usage_bytes{component_name=~\".*(scheduler|webserver|worker|flower|redis|pgbouncer|statsd).*\", deployment=~\"$deployment\"}",
+          "expr": "container_memory_usage_bytes{deployment=~\"$deployment\", pod_name!~\".*-worker-.*\",component_name != \"POD\",image!=\"\", container_name!=\"istio-proxy\"} * 100 / container_spec_memory_limit_bytes{deployment=~\"$deployment\", pod_name!~\".*-worker-.*\",component_name != \"POD\",image!=\"\", container_name!=\"istio-proxy\"}",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{component_name}}",
+          "legendFormat": "{{container_name}}",
           "refId": "A"
         }
       ],
@@ -1705,7 +1743,7 @@
       },
       "yaxes": [
         {
-          "format": "decbytes",
+          "format": "percent",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -1734,11 +1772,12 @@
       "datasource": "Prometheus",
       "description": "Received data across deployment containers.",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 6,
         "w": 12,
         "x": 0,
-        "y": 32
+        "y": 39
       },
       "id": 28,
       "legend": {
@@ -1754,6 +1793,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "paceLength": 10,
       "percentage": false,
       "pointradius": 5,
@@ -1821,11 +1863,12 @@
       "datasource": "Prometheus",
       "description": "Transmitted data across deployment containers.",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 6,
         "w": 12,
         "x": 12,
-        "y": 32
+        "y": 39
       },
       "id": 30,
       "legend": {
@@ -1841,6 +1884,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "paceLength": 10,
       "percentage": false,
       "pointradius": 5,
@@ -1906,7 +1952,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 38
+        "y": 45
       },
       "id": 62,
       "panels": [],
@@ -1922,10 +1968,11 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 39
+        "y": 46
       },
       "id": 60,
       "links": [],
+      "options": {},
       "pageSize": null,
       "scroll": true,
       "showHeader": true,
@@ -2065,10 +2112,11 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 39
+        "y": 55
       },
       "id": 70,
       "links": [],
+      "options": {},
       "pageSize": null,
       "scroll": true,
       "showHeader": true,
@@ -2201,7 +2249,7 @@
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 18,
+  "schemaVersion": 19,
   "style": "dark",
   "tags": [
     "airflow"

@@ -21,10 +21,10 @@ LABEL io.astronomer.docker.build.number=$BUILD_NUMBER
 LABEL io.astronomer.docker=true
 LABEL io.astronomer.docker.module="airflow"
 LABEL io.astronomer.docker.component="airflow"
-LABEL io.astronomer.docker.airflow.version="1.10.4"
+LABEL io.astronomer.docker.airflow.version="1.10.5"
 
 ARG ORG="astronomer"
-ARG VERSION="1.10.4-1"
+ARG VERSION="1.10.5-1"
 ARG SUBMODULES="all, statsd, elasticsearch"
 
 ENV AIRFLOW_REPOSITORY="https://github.com/${ORG}/airflow"
@@ -42,6 +42,10 @@ ENV ASTRONOMER_GROUP=${ASTRONOMER_GROUP}
 RUN addgroup -S ${ASTRONOMER_GROUP} \
 	&& adduser -S -G ${ASTRONOMER_GROUP} ${ASTRONOMER_USER}
 
+RUN echo @edge-community http://dl-cdn.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories \
+	&& echo @edge-testing http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories \
+	&& echo @edge http://dl-cdn.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories
+
 # Install packages
 RUN apk update \
 	&& apk add --no-cache --virtual .build-deps \
@@ -55,39 +59,44 @@ RUN apk update \
 		libxml2-dev \
 		libxslt-dev \
 		linux-headers \
-		mariadb-dev \
 		nodejs \
 		nodejs-npm \
-		postgresql-dev \
 		python3-dev \
 		tzdata \
-		libsodium \
-		libsodium-dev \
 	&& apk add --no-cache \
 		bash \
 		ca-certificates \
 		cyrus-sasl \
+		cython3@edge \
+		freetds \
 		krb5-libs \
-		mariadb-connector-c \
-		postgresql \
+		py3-bcrypt@edge \
+		py3-cassandra-driver@edge-testing'>='3 \
+		py3-cryptography@edge \
+		py3-fastavro@edge-testing \
+		py3-grpcio@edge-testing \
+		py3-mysqlclient \
+		py3-numpy-dev@edge-community \
+		py3-numpy@edge-community \
+		py3-pandas@edge-testing \
+		py3-psycopg2 \
+		py3-pycryptodome@edge-community \
+		py3-pynacl@edge \
+		py3-typed-ast@edge-testing \
 		python3 \
 		tini \
 	&& update-ca-certificates \
 	&& cp /usr/share/zoneinfo/UTC /etc/localtime \
-	&& pip3 install --no-cache-dir --upgrade pip==19.2.1 \
+	&& pip3 install --no-cache-dir --upgrade pip==19.2.3 \
 	&& pip3 install --no-cache-dir --upgrade setuptools==41.0.1 \
-	&& pip3 install --no-cache-dir cython \
-	&& pip3 install --no-cache-dir numpy \
-	&& pip3 install --no-cache-dir flask==1.0.0 \
-	# https://pynacl.readthedocs.io/en/stable/install/
-	&& SODIUM_INSTALL=system pip3 install --no-cache-dir pynacl==1.3.0 \
+	&& pip3 install --no-cache-dir --upgrade snowflake-connector-python==1.9.0 \
 	&& pip3 install --no-cache-dir "${AIRFLOW_MODULE}" \
 	&& pip3 install --no-cache-dir "https://github.com/astronomer/astronomer-fab-securitymanager/releases/download/v1.2.1/astronomer_fab_security_manager-1.2.1-py3-none-any.whl" \
 	&& cd /usr/lib/python3.7/site-packages/airflow/www_rbac \
 	&& npm install \
 	&& npm run build \
 	&& rm -rf node_modules \
-	&& apk del .build-deps \
+	&& apk del .build-deps py3-numpy-dev \
 	&& ln -sf /usr/bin/python3 /usr/bin/python \
 	&& ln -sf /usr/bin/pip3 /usr/bin/pip
 
@@ -97,8 +106,8 @@ RUN mkdir -p ${AIRFLOW_HOME}/logs
 # Copy entrypoint to root
 COPY include/entrypoint /
 
-# Copy cron scripts
-COPY include/clean-airflow-logs /etc/periodic/15min/clean-airflow-logs
+# Copy "cron" scripts
+COPY include/clean-airflow-logs /usr/local/bin/clean-airflow-logs
 
 # Ensure our user has ownership to AIRFLOW_HOME
 RUN chown -R ${ASTRONOMER_USER}:${ASTRONOMER_GROUP} ${AIRFLOW_HOME}

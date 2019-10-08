@@ -16,7 +16,7 @@ DRONE_REPOSITORIES := astronomer commander db-bootstrapper default-backend houst
 GITHUB_ORG := astronomer
 
 # Airflow versions
-AIRFLOW_VERSIONS := 1.10.4
+AIRFLOW_VERSIONS := 1.10.5
 
 # Vendor components
 VENDOR_COMPONENTS := alertmanager cadvisor curator elasticsearch elasticsearch-exporter fluentd grafana kibana kubed kube-state nginx nginx-es pgbouncer pgbouncer-exporter prisma prometheus redis registry statsd-exporter
@@ -101,6 +101,19 @@ push-airflow-ref:
 		PUSH_IMAGE=${REPOSITORY}/ap-airflow \
 		PUSH_TAGS="${ASTRONOMER_REF}-$${version} ${ASTRONOMER_REF}-$${version}-onbuild" \
 		bin/push-image; \
+	done;
+
+.PHONY: scan-platform
+scan-platform: check-env
+	for component in ${PLATFORM_COMPONENTS} ; do \
+		PUSH_IMAGE=${REPOSITORY}/ap-$${component} \
+		PUSH_TAGS="${ASTRONOMER_REF}" \
+		bin/clair-scan || exit 1 ; \
+	done;
+	for component in ${VENDOR_COMPONENTS} ; do \
+		PUSH_IMAGE=${REPOSITORY}/ap-$${component} \
+		PUSH_TAGS="${ASTRONOMER_REF}" \
+		bin/clair-scan || exit 1 ; \
 	done;
 
 #
